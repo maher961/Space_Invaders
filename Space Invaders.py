@@ -46,10 +46,10 @@ class Laser():
         self.y = y
         self.surface = surface
 
-    def draw(self):
+    def draw(self):     # Laser zeichnen
         pygame.draw.rect(self.surface.screen, (0, 255, 0),
                          pygame.Rect(self.x, self.y, 2, 8))
-        self.y -= 2
+        self.y -= 2     # Schrittgeschwindigkeit von Laser
 
 
 class Alien():
@@ -71,11 +71,12 @@ class Alien():
                          pygame.Rect(self.x, self.y, self.size, self.hoehe))
         pygame.draw.rect(self.surface.screen, (200, 0, 0),
                          pygame.Rect(self.x + 12, self.y, self.mitte_breit, self.size))
-        pygame.draw.rect(self.surface.screen, (200, 0, 0),
+        # Seiten
+        pygame.draw.rect(self.surface.screen, (200, 0, 0),  # Seite Link
                          pygame.Rect(self.x, self.y + 10, self.breit, self.hoehe))
-        pygame.draw.rect(self.surface.screen, (200, 0, 0),
+        pygame.draw.rect(self.surface.screen, (200, 0, 0),  # Seite Link
                          pygame.Rect(self.x + 25, self.y + 10, self.breit, self.hoehe))
-        self.y += 0.20
+        self.y += 0.20     # Geschwindigkeit von Aliens
 
     def kill_aliens(self, surface):
         for laser in surface.laser_list:
@@ -83,8 +84,8 @@ class Alien():
                     laser.x > self.x - 6 and
                     laser.y < self.y + self.size and
                     laser.y > self.y ):
-                surface.laser_list.remove(laser)
-                surface.aliens.remove(self)
+                surface.laser_list.remove(laser)    # Laser gelöscht
+                surface.aliens.remove(self)         # Alien gelöscht
 
 
 class AlienFeld():
@@ -93,8 +94,8 @@ class AlienFeld():
     :return:
     """
     def __init__(self, surface):
-        margin = 30
-        zwischen_breit = 50
+        margin = 30     # Wie breit soll von der linke Seite
+        zwischen_breit = 50     # zwischen Abstand
         for x in range(margin, surface.width - margin, zwischen_breit):
             for y in range(margin, int(surface.height / 2), zwischen_breit):
                 surface.aliens.append(Alien(surface, x, y))
@@ -140,8 +141,8 @@ class ShieldFeld():
     :return:
     """
     def __init__(self, surface):
-        margin = 75
-        zwischen_breit = 100
+        margin = 75             # Wie breit soll von der linke Seite
+        zwischen_breit = 100    # Zwischen Abstand
         m = 10
         for x in range(margin, surface.width - margin, zwischen_breit):
             for y in range(margin, int(surface.height / 5), m):
@@ -167,7 +168,7 @@ class Game():
         self.clock = pygame.time.Clock()
         self.pause = True
         self.bg = pygame.transform.scale(pygame.image.load(os.path.join(r"images/bg_1.png")), (self.width, self.height))
-        self.position = (0, 0)
+        self.position = (0, 0)      # Position für das Hintergrundbild
         self.image = pygame.transform.scale(pygame.image.load(r"images/mk_ship.png"), (50, 50))
         colorkey = self.image.get_at((0, 0))
         self.image.set_colorkey(colorkey, RLEACCEL)
@@ -181,26 +182,26 @@ class Game():
                 self.displayText("Gewonnen!!!")
 
             pressed = pygame.key.get_pressed()
-            if pressed[pygame.K_LEFT]:
-                Ship_position.x -= 2 if Ship_position.x > 0 else 0
-            elif pressed[pygame.K_RIGHT]:
-                Ship_position.x += 2 if Ship_position.x < self.width - 50 else 0
+            if pressed[pygame.K_LEFT]:         # Taste Links
+                Ship_position.x -= 2 if Ship_position.x > 0 else 0  # linke Bereichsgrenze (2 Schritte nach Links / 0 px Begranzung)
+            elif pressed[pygame.K_RIGHT]:      # Taste Links
+                Ship_position.x += 2 if Ship_position.x < self.width - 50 else 0    # rechte Bereichsgrenze linke Bereichsgrenze (2 Schritte nach Rechts / - 50 px Begranzung)
 
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                    self.laser_list.append(Laser(self, Ship_position.x + 24, Ship_position.y))
+                    self.laser_list.append(Laser(self, Ship_position.x + 24, Ship_position.y))  # Wenn Leertaste gedrückt wird, soll das Spiel Laser in "Position Ship schießen
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
                     self.pause = not self.pause
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE or event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
 
-            if self.pause:
+            if self.pause:              # Das ist für die Pause
                 pygame.display.flip()
-                self.clock.tick(80)
+                self.clock.tick(80)     # Geschwindigkeit der Ship von Recht zu Links
                 self.screen.blit(self.bg, self.position)
                 self.r = pygame.Rect((Ship_position.x, Ship_position.y), (30, 30))
-                self.screen.blit(self.image,self.r)
+                self.screen.blit(self.image,self.r)     # Anzeige von Ship
                 for shield in self.steine:
                     shield.draw()
                     shield.kill_schield(self)
